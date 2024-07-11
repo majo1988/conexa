@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Vehicles List</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <h1>Vehicles List</h1>
+    <div>
+        <label for="filter">Filtrar por nombre o ID:</label>
+        <input type="text" id="filter" class="form-control" placeholder="Buscar...">
+    </div>
+    <table class="table table-bordered mt-3">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Clase</th>
+            <th>Pasajeros</th>
+            <th>Capacidad</th>
+            <th>Películas</th>
+            <th>Pilotos</th>
+        </tr>
+        </thead>
+        <tbody id="vehiclesTableBody">
+        <tr th:each="vehicle : ${vehicles}">
+            <td th:text="${vehicle.id}" class="vehicles-id"></td>
+            <td th:text="${vehicle.name}" class="vehicles-name"></td>
+            <td th:text="${vehicle.vehicleClass}"></td>
+            <td th:text="${vehicle.passengers}"></td>
+            <td th:text="${vehicle.cargoCapacity}"></td>
+            <td>
+                <ul>
+                    <li th:each="film : ${vehicle.films}">
+                        <span th:text="${film.title}"></span>
+                    </li>
+                </ul>
+            </td>
+            <td>
+                <ul>
+                    <li th:each="pilot : ${vehicle.pilots}">
+                        <span th:text="${pilot.name}"></span>
+                    </li>
+                </ul>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div>
+        <ul class="pagination">
+            <li th:class="${currentPage == null or currentPage == 0} ? 'disabled' : ''">
+                <a th:if="${currentPage != null and currentPage > 0}" th:href="@{'/vehicles?page=' + (currentPage - 1) + '&size=' + size}">Anterior</a>
+                <span th:if="${currentPage == null or currentPage == 0}" class="btn btn-secondary">Anterior</span>
+            </li>
+            <li>
+                <span th:text="'Página ' + (${currentPage != null ? currentPage + 1 : 1})"></span>
+            </li>
+            <li th:class="${currentPage == null or currentPage == totalPages - 1} ? 'disabled' : ''">
+                <a th:if="${currentPage != null and currentPage < totalPages - 1}" th:href="@{'/vehicles?page=' + (currentPage + 1) + '&size=' + size}">Siguiente</a>
+                <span th:if="${currentPage == null or currentPage == totalPages - 1}" class="btn btn-secondary">Siguiente</span>
+            </li>
+        </ul>
+        <span th:if="${totalPages == 0}" class="btn btn-secondary">No hay datos para mostrar.</span>
+        <span th:if="${totalPages > 0}" class="btn btn-secondary">Página <span th:text="${(currentPage != null ? currentPage : 0) + 1}"></span> de <span th:text="${totalPages}"></span></span>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        function filterTable() {
+            const filterValue = $('#filter').val().toLowerCase();
+            $('#vehiclesTableBody tr').each(function () {
+                const id = $(this).find('.vehicles-id').text().toLowerCase();
+                const name = $(this).find('.vehicles-name').text().toLowerCase();
+                if (id.includes(filterValue) || name.includes(filterValue)) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+        }
+
+        $('#filter').on('input', filterTable);
+        $('#filter').on('keypress', function(e) {
+            if (e.which == 13) {
+                filterTable();
+            }
+        });
+    });
+</script>
+</body>
+</html>

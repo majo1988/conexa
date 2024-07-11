@@ -2,13 +2,15 @@ package com.tecnica.conexa.api;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-@Service
+@Component
 @Log4j2
+@Api(tags = "StarWars API")
 public class StarWarsApi {
 
     private final RestTemplate restTemplate;
@@ -19,6 +21,7 @@ public class StarWarsApi {
         this.objectMapper = objectMapper;
     }
 
+    @ApiOperation(value = "Obtener datos de Star Wars", notes = "Obtiene datos de la API de Star Wars basados en el endpoint proporcionado.")
     public JsonNode fetchStarWarsData(String endpoint) {
         String apiUrl = "https://swapi.dev/api/" + endpoint;
 
@@ -29,20 +32,5 @@ public class StarWarsApi {
             log.error("Error fetching data from Star Wars API: ", e);
             return null;
         }
-    }
-
-    @Scheduled(cron = "*/10 * * * * *")
-    public void scheduledUpdateStarWarsData() {
-        System.out.println("entra aca ");
-        log.info("Actualizando datos de Star Wars...");
-        JsonNode peopleData = fetchStarWarsData("people/");
-        JsonNode filmsData = fetchStarWarsData("films/");
-        JsonNode starshipsData = fetchStarWarsData("starships/");
-        JsonNode vehiclesData = fetchStarWarsData("vehicles/");
-
-        log.info("People Data: {}", peopleData);
-        log.info("Films Data: {}", filmsData);
-        log.info("Starships Data: {}", starshipsData);
-        log.info("Vehicles Data: {}", vehiclesData);
     }
 }
